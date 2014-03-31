@@ -43,6 +43,10 @@ int main(int argc, char* argv[]) {
     }
     fclose(fp);
 
+    /* The adler crc64 initializes all lookup tables on the first call,
+     * so the first call isn't representative of true speed. */
+    crc64(0,(unsigned char*)"init",4);
+
     long long start = ustime();
     unsigned long long result = crc64(0,(unsigned char*)contents,sz);
     long long end = ustime();
