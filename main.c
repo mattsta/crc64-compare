@@ -90,6 +90,7 @@ int main(int argc, char* argv[]) {
     char *contents = malloc(sz); /* potentially very big */
 
     if (fread(contents, sz, 1, fp) != 1) {
+        free(contents);
         perror("Could not read entire file");
         return 1;
     }
