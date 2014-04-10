@@ -19,9 +19,9 @@ static long long ustime(void) {
     return ust;
 }
 
-#define DURATION ((duration - filter_overhead)/1e6)
+#define DURATION_SEC ((duration - filter_overhead)/1e6)
 #define SIZE(i) (size * i)
-#define CURRENT_GEEBEES(i) SIZE(i)/DURATION/1024
+#define CURRENT_GEEBEES(i) SIZE(i)/DURATION_SEC/1024
 
 int memspeed(int size, int iterations) {
     int size_mb = size * 1024 * 1024;
@@ -31,10 +31,13 @@ int memspeed(int size, int iterations) {
     long long duration = 0;
     long long size_mb_time = size * iterations;
     long filter_overhead = 0;
+    long long start, stop;
+    unsigned long long bigop_orig, bigop;
+
+    bigop_orig = bigop = 1e9 + 1e9/2;
 
     printf("Computing average call overhead...\n");
     for (i = 0; i < warmup; i++) {
-        long long start, stop;
         start = ustime();
         memset(mem, 0xDA, 1);
         stop = ustime();
@@ -46,7 +49,6 @@ int memspeed(int size, int iterations) {
 
     printf("Running %d iterations of writing %d MB of memory\n", iterations, size);
     for (i = 0; i < iterations; i++) {
-        long long start, stop;
         if (i && i % 50 == 0)
             printf("Iterations remaining: %d (current throughput: %.2f GB/s)\n", iterations-i, CURRENT_GEEBEES(i));
         start = ustime();
@@ -63,9 +65,20 @@ int memspeed(int size, int iterations) {
         return EXIT_FAILURE;
     }
 
-    duration_s = DURATION;
-    printf("Wrote %llu MB in %.4f seconds for a speed of %.4f MB/s (%.4f GB/s)\n",
+    duration_s = DURATION_SEC;
+    printf("Wrote %llu MB in %.4f seconds for a memory write speed of %.4f MB/s (%.4f GB/s)\n",
         size_mb_time, duration_s, size_mb_time/duration_s, (size_mb_time/duration_s/1024));
+
+    printf("Now running a quick CPU speed test for %llu iterations...\n", bigop_orig);
+    start = ustime();
+    while(bigop--) ;
+    stop = ustime();
+
+    duration = stop - start;
+    duration_s = duration/1e6;
+    printf("Iterations completed in %.2f seconds for an execution speed of %.1f million (subtraction) operations per second using one core.\n",
+        duration_s, bigop_orig/1e6/duration_s);
+    printf("Loop latency: %.2f nanoseconds per iteration.\n", duration*1000/(float)bigop_orig);
 
     return EXIT_SUCCESS;
 }
