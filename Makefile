@@ -7,7 +7,7 @@ TARGETS=crc64-redis crc64-adler
 all: $(TARGETS)
 
 %: %.c main.c
-	$(CC) $(CFLAGS) -o $@ $^
+	$(CC) $(CFLAGS) -o $@ $^ -lpthread
 
 clean:
 	rm -f $(TARGETS)

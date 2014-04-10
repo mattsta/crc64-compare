@@ -19,6 +19,11 @@ static long long ustime(void) {
     return ust;
 }
 
+/* GCC 4.8 on Linux is dumb */
+#ifndef ftello
+extern off_t ftello(FILE *stream);
+#endif
+
 int main(int argc, char* argv[]) {
     if (argc == 1) {
         printf("e9c6d914c4b8d9ca == %016llx\n",
