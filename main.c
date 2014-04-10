@@ -25,53 +25,7 @@ static long long ustime(void) {
 extern off_t ftello(FILE *stream);
 #endif
 
-int memspeed(int size, int iterations) {
-    int size_mb = size * 1024 * 1024;
-    char *mem = malloc(size_mb);
-    float duration_s, syscall_latency = 0;
-    int i, warmup = 10000;
-    long long istart, istop, duration;
-    long long size_mb_time = size * iterations;
-    long filter_overhead = 0;
-
-    for (i = 0; i < warmup; i++) {
-        long long start, stop;
-        start = ustime();
-        memset(mem, 0xC0, 1);
-        stop = ustime();
-        syscall_latency += stop - start;
-    }
-    syscall_latency /= warmup;
-    printf("Average call overhead: %f microseconds\n", syscall_latency);
-    filter_overhead = syscall_latency * iterations;
-
-    istart = ustime();
-    while(iterations--) {
-        memset(mem, 0xC0, size_mb);
-    }
-    istop = ustime();
-    free(mem);
-
-    duration = istop - istart;
-    duration_s = (duration - filter_overhead)/1e6;
-
-    printf("Wrote %llu MB in %f seconds for a speed of %f MB/s (%f GB/s)\n",
-        size_mb_time, duration_s, size_mb_time/duration_s, (size_mb_time/duration_s/1024));
-    return EXIT_SUCCESS;
-}
-
 int main(int argc, char* argv[]) {
-    if (argc == 3) {
-        int size = atoi(argv[1]);
-        int iterations = atoi(argv[2]);
-
-        if (size < 0 || iterations < 0) {
-            printf("size and iterations must be positive\n");
-            return EXIT_FAILURE;
-        }
-        return memspeed(size, iterations);
-    }
-
     if (argc == 1) {
         printf("e9c6d914c4b8d9ca == %016llx\n",
             (unsigned long long) crc64(0,(unsigned char*)"123456789",9));

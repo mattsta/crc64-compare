@@ -1,3 +1,4 @@
 *.dSYM
 crc64-adler
 crc64-redis
+mem-speed
