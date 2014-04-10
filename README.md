@@ -49,3 +49,25 @@ Example Differences
     Redis throughput: 401.824009 MB/s
     Adler is 4.07x faster than Redis
 ```
+
+Bonus
+-----
+As a bonus, `mem-speed` also lives here.  It takes two arguments: size, in MB, of space to allocate for testing
+and the number of iterations to run the test.  For example: `./mem-speed 200 1000` will allocate
+200 MB of space and run the test 1000 times.
+
+Example output:
+```haskell
+matt@ununoctium:~/repos/crc64-compare% ./mem-speed 200 200
+Computing average call overhead...
+Average call overhead: 0.0566 microseconds
+Running 200 iterations of writing 200 MB of memory
+Iterations remaining: 150 (current throughput: 14.19 GB/s)
+Iterations remaining: 100 (current throughput: 14.95 GB/s)
+Iterations remaining: 50 (current throughput: 15.19 GB/s)
+Completed writing.
+Wrote 40000 MB in 2.5487 seconds for a memory write speed of 15694.1826 MB/s (15.3264 GB/s)
+Now running a quick CPU speed test for 1500000000 iterations...
+Iterations completed in 2.93 seconds for an execution speed of 511.9 million (subtraction) operations per second using one core.
+Loop latency: 1.95 nanoseconds per iteration.
+```
